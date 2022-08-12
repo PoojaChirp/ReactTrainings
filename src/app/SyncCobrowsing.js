@@ -20,7 +20,7 @@ class SyncCobrowsing extends React.Component {
         id: '',
         petName: '',
         ownerName: '',
-        aptNote: '',
+        aptNotes: '',
         aptDate: ''
       }
     };
@@ -28,19 +28,19 @@ class SyncCobrowsing extends React.Component {
     this.setFormValue = this.setFormValue.bind(this);
   }
 
-   formDataPublish(){
+  //  formDataPublish(){
 
-    const petInfo = {
-      id: lastId + 1,
-      ownerName: formData.ownerName,
-      petName: formData.petName,
-      aptDate: formData.aptDate + ' ' + formData.aptTime,
-      aptNotes: formData.aptNotes
-    }
-    // onSendPetInfo(petInfo);
-    this.setFormValue = this.setFormValue.bind(onSendPetInfo(petInfo));
+  //   const petInfo = {
+  //     id: lastId + 1,
+  //     ownerName: formData.ownerName,
+  //     petName: formData.petName,
+  //     aptDate: formData.aptDate + ' ' + formData.aptTime,
+  //     aptNotes: formData.aptNotes
+  //   }
+  //   // onSendPetInfo(petInfo);
+  //   this.setFormValue = this.setFormValue.bind(onSendPetInfo(petInfo));
 
-  }
+  // }
 
   componentDidMount() {
     // fetch an access token from the localhost server
@@ -80,8 +80,9 @@ class SyncCobrowsing extends React.Component {
     if (!this.client) {
       return;
     }
-    this.client.list(this.props.sessionId).then(function(list) {
-      list.set(0, formData);
+    this.client.list("OrangesList").then(function(list) {
+      list.push(formData);
+   // list.removeList() .then(() => { console.log('List removeList() successful'); }) .catch((error) => { console.error('List removeList() failed', error); });
     });
   }
 
@@ -205,7 +206,7 @@ class SyncCobrowsing extends React.Component {
   async loadFormData(){
     let component = this;
 
-    this.client.list('MyList')
+    this.client.list('OrangesList')
     .then((list) => {
       console.log('Successfully opened a List. SID:', list.sid);
       //component.setState({formData: list.data});
@@ -214,7 +215,7 @@ class SyncCobrowsing extends React.Component {
         console.log('Sync Updated Data', data);
         if (!data.isLocal) {
           console.log('Setting state with', data.data);
-          component.setState({formData: data.data});
+        //  component.setState({formData: data.data});
         }
     });
   });   
@@ -229,7 +230,8 @@ class SyncCobrowsing extends React.Component {
   setFormValue(fieldName,value) {
     var formData = this.state.formData;
     formData[fieldName] = value;
-    this.setState({formData: formData}, () => this.updateSyncList(formData));
+    this.setState({formData: formData});
+   // this.setState({formData: formData}, () => this.updateSyncList(formData));
     console.log("success updatelist");
   }
 
@@ -250,42 +252,72 @@ class SyncCobrowsing extends React.Component {
             <div className="card border-primary">
                 <div className="card-header text-info">
                     <div className="input-group mb-3">
-                      <SyncedInputField
+                      {/* <SyncedInputField
                         setFormValue={this.setFormValue}
                         formDataKey="pid" 
                         formDataValue={this.state.formData['pid']} 
-                        placeholder="ID"/>
+                        placeholder="ID"/> */}
+                        <label>
+                    ID :
+                    <input type="text" name="id" id="id"
+                    onChange={(event) => { this.setState({formData:{id : event.target.value}})}}
+                    value={this.state.value } /> 
+                    </label>
                     </div>
                     <div className="input-group mb-3">
-                      <SyncedInputField
+                      {/* <SyncedInputField
                         setFormValue={this.setFormValue}
                         formDataKey="petName" 
                         formDataValue={this.state.formData['petName']} 
-                        placeholder="Pet Name"/>
+                        placeholder="Pet Name"/> */}
+                        <label>
+                    Owner Name :
+                    <input type="text" name="ownerName" id="ownerName"
+                    onChange={(event) => { this.setState({formData:{ownerName : event.target.value}})}}
+                    value={this.state.value } /> 
+                    </label>
                     </div>
                     <div className="input-group mb-3">
-                      <SyncedInputField
+                      {/* <SyncedInputField
                         setFormValue={this.setFormValue}
                         formDataKey="ownerName" 
                         formDataValue={this.state.formData['ownerName']} 
-                        placeholder="Owner Name"/>
+                        placeholder="Owner Name"/> */}
+                         <label>
+                    Pet Name :
+                    <input type="text" name="petName" id="petName"
+                    onChange={(event) => { this.setState({formData:{petName : event.target.value}})}}
+                    value={this.state.value } /> 
+                    </label>
                     </div>
                     <div className="input-group mb-3">
-                      <SyncedInputField
+                      {/* <SyncedInputField
                         setFormValue={this.setFormValue}
                         formDataKey="aptDate" 
                         formDataValue={this.state.formData['aptDate']} 
-                        placeholder="Apt Date"/>
+                        placeholder="Apt Date"/> */}
+                         <label>
+                    Appointment Date :
+                    <input type="text" name="aptDate" id="aptDate"
+                    onChange={(event) => { this.setState({formData:{aptDate : event.target.value}})}}
+                    value={this.state.value } /> 
+                    </label>
                     </div>
                     <div className="input-group mb-3">
-                      <SyncedInputField
+                      {/* <SyncedInputField
                         setFormValue={this.setFormValue}
                         formDataKey="aptTime" 
                         formDataValue={this.state.formData['aptTime']} 
-                        placeholder="Apt Time"/>
+                        placeholder="Apt Time"/> */}
+                        <label>
+                    Appointment Notes :
+                    <input type="text" name="aptNotes" id="aptNotes"
+                    onChange={(event) => { this.setState({formData:{aptNotes : event.target.value}})}}
+                    value={this.state.value } /> 
+                    </label>
                     </div>
                 </div>
-                <button type = "submit" onClick ={this.formDataPublish}>Submit </button>
+                <button type="submit" onClick={this.updateSyncList(this.state.formData)} >Submit </button>
             </div>
            
         </div>

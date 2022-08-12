@@ -7,6 +7,8 @@ import axios from 'axios';
 import Participants from './Participants.js'
 import SyncedInputField from './SyncedInputField';
 
+// <SyncCobrowsing sessionId={this.state.sessionId} identity={this.state.identity}/> :
+
 class SyncCobrowsing extends React.Component {
   constructor(props) {
     super(props);
@@ -15,14 +17,29 @@ class SyncCobrowsing extends React.Component {
       errorMessage: '',
       participants: [],
       formData: {
-        firstName: '',
-        lastName: '',
-        phoneNumber: '',
-        subscribeToMailingList: false
+        id: '',
+        petName: '',
+        ownerName: '',
+        aptNote: '',
+        aptDate: ''
       }
     };
 
     this.setFormValue = this.setFormValue.bind(this);
+  }
+
+   formDataPublish(){
+
+    const petInfo = {
+      id: lastId + 1,
+      ownerName: formData.ownerName,
+      petName: formData.petName,
+      aptDate: formData.aptDate + ' ' + formData.aptTime,
+      aptNotes: formData.aptNotes
+    }
+    // onSendPetInfo(petInfo);
+    this.setFormValue = this.setFormValue.bind(onSendPetInfo(petInfo));
+
   }
 
   componentDidMount() {
@@ -50,12 +67,21 @@ class SyncCobrowsing extends React.Component {
     }
   }
 
-  updateSyncDocument(formData) {
+  // updateSyncDocument(formData) {
+  //   if (!this.client) {
+  //     return;
+  //   }
+  //   this.client.document(this.props.sessionId).then(function(doc) {
+  //     doc.set(formData);
+  //   });
+  // }
+
+  updateSyncList(formData) {
     if (!this.client) {
       return;
     }
-    this.client.document(this.props.sessionId).then(function(doc) {
-      doc.set(formData);
+    this.client.list(this.props.sessionId).then(function(list) {
+      list.set(0, formData);
     });
   }
 
@@ -159,28 +185,54 @@ class SyncCobrowsing extends React.Component {
     });
   }
 
-  async loadFormData() {
+  // async loadFormData() {
+  //   let component = this;
+
+  //   this.client.document(this.props.sessionId).then(function(doc) {
+  //     component.setState({formData: doc.data});
+
+  //     doc.on("updated",function(data) {
+  //       console.log('Sync Updated Data', data);
+  //       if (!data.isLocal) {
+  //         console.log('Setting state with', data.data);
+  //         component.setState({formData: data.data});
+  //       }
+  //     });
+    
+  //   });
+  // }
+
+  async loadFormData(){
     let component = this;
 
-    this.client.document(this.props.sessionId).then(function(doc) {
-      component.setState({formData: doc.data});
-
-      doc.on("updated",function(data) {
+    this.client.list('MyList')
+    .then((list) => {
+      console.log('Successfully opened a List. SID:', list.sid);
+      //component.setState({formData: list.data});
+      console.log('form data value is',list.data);
+      list.on('itemAdded', function(data) {
         console.log('Sync Updated Data', data);
         if (!data.isLocal) {
           console.log('Setting state with', data.data);
           component.setState({formData: data.data});
         }
-      });
-    
     });
+  });   
   }
+
+  // setFormValue(fieldName,value) {
+  //   var formData = this.state.formData;
+  //   formData[fieldName] = value;
+  //   this.setState({formData: formData}, () => this.updateSyncDocument(formData));
+  // }
 
   setFormValue(fieldName,value) {
     var formData = this.state.formData;
     formData[fieldName] = value;
-    this.setState({formData: formData}, () => this.updateSyncDocument(formData));
+    this.setState({formData: formData}, () => this.updateSyncList(formData));
+    console.log("success updatelist");
   }
+
 
   render() {
     return (
@@ -200,20 +252,42 @@ class SyncCobrowsing extends React.Component {
                     <div className="input-group mb-3">
                       <SyncedInputField
                         setFormValue={this.setFormValue}
-                        formDataKey="firstName" 
-                        formDataValue={this.state.formData['firstName']} 
-                        placeholder="First Name"/>
+                        formDataKey="pid" 
+                        formDataValue={this.state.formData['pid']} 
+                        placeholder="ID"/>
                     </div>
                     <div className="input-group mb-3">
                       <SyncedInputField
                         setFormValue={this.setFormValue}
-                        formDataKey="lastName" 
-                        formDataValue={this.state.formData['lastName']} 
-                        placeholder="Last Name"/>
+                        formDataKey="petName" 
+                        formDataValue={this.state.formData['petName']} 
+                        placeholder="Pet Name"/>
+                    </div>
+                    <div className="input-group mb-3">
+                      <SyncedInputField
+                        setFormValue={this.setFormValue}
+                        formDataKey="ownerName" 
+                        formDataValue={this.state.formData['ownerName']} 
+                        placeholder="Owner Name"/>
+                    </div>
+                    <div className="input-group mb-3">
+                      <SyncedInputField
+                        setFormValue={this.setFormValue}
+                        formDataKey="aptDate" 
+                        formDataValue={this.state.formData['aptDate']} 
+                        placeholder="Apt Date"/>
+                    </div>
+                    <div className="input-group mb-3">
+                      <SyncedInputField
+                        setFormValue={this.setFormValue}
+                        formDataKey="aptTime" 
+                        formDataValue={this.state.formData['aptTime']} 
+                        placeholder="Apt Time"/>
                     </div>
                 </div>
+                <button type = "submit" onClick ={this.formDataPublish}>Submit </button>
             </div>
-
+           
         </div>
         <span id="floating-badges"></span>
         <span id="signals"></span>
